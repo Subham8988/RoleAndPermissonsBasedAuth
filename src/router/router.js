@@ -18,4 +18,12 @@ route.get('/roleList',controller.roleList);
 //assign permissons to role
 route.post('/asignPermissonsToRole',controller.assignPtoR);
 
+//create user
+route.post('/creatUser',controller.registerUsers);
+route.delete('/deleteUser',controller.deleteuser);
+route.get('/all_users',controller.userList);
+
+// assign role to user
+route.post('/assignRoleToUser',controller.assignRoleToUser)
+
 module.exports=route;

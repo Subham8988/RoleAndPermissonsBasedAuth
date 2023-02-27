@@ -28,6 +28,26 @@ const roleSchema =db.Schema({
 
     ],
 },{ versionKey: false });
+
+const userSchema =db.Schema({
+    name:{
+        type:String
+    },
+    mobile_no:{
+        type:Number
+    },
+    email:{
+        type:String
+    },
+    Status:{
+        type:Boolean
+    },
+    user_id:{type:Number},
+    role:[
+
+    ]
+},{versionKey:false});
 const permissons = new mongoose.model('permisson',permissonsSchema);
-const roles = new mongoose.model('role',roleSchema)
-module.exports ={permissons,roles};
+const roles = new mongoose.model('role',roleSchema);
+const users= new mongoose.model('user',userSchema);
+module.exports ={permissons,roles,users};

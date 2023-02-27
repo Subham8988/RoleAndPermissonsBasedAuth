@@ -40,7 +40,7 @@ const deletePermissons= async (req,res)=>{
         if(permisson_Id!='' && permisson_Id!=undefined && permisson_Id!=null)
         {
             var data = await db.permissons.findOneAndDelete({permission_Id:permisson_Id});
-            console.log(data);
+        
             if(data)
             {
                 res.status(200).send({status:"200",msg:`permission with permission_Id ${permisson_Id} deleted sucesfully `})
@@ -138,20 +138,117 @@ const assignPtoR = async (req,res)=>{
         let a =permission_Id.split(',');
         var role_Id = req.query.role_Id;
         var purm =[];
+        let permissionsArrrayObj=[];
         var permissonsData={};
         var  roleData = await db.roles.find({role_Id:role_Id});
-        for(var i=0;i<a.length;i++)
+        if(roleData!=''&&roleData!=null&&roleData!=undefined)
         {
-             permissonsData= await db.permissons.find({permission_Id:a[i]},{_id:0});
-            purm[i]=permissonsData;
-        }   
-        console.log(purm);
-        // var dataaa= await db.roles.findByIdAndUpdate(roleData[0]._id,{permissons:purm});
-        res.status(200).send({status:200,msg:`permissons with permissons id ${permission_Id} is assign to role id ${role_Id}`});
-
+            for(var i=0;i<a.length;i++)
+            {
+                 permissonsData= await db.permissons.find({permission_Id:a[i]},{_id:0});
+                purm[i]=permissonsData;
+                permissionsArrrayObj[i]=purm[i][0]
+            }   
+            var dataaa= await db.roles.findByIdAndUpdate(roleData[0]._id,{permissons:permissionsArrrayObj});
+            res.status(200).send({status:200,msg:`permissons with permissons id ${permission_Id} is assign to role id ${role_Id}`});
+        }
+        else{
+            res.status(400).send({status:400,msg:'Bad request'});
+        }
     } catch (error) {
         res.status(500).send({status:"500",msg:"err",err:`${error}`});
     }
 }
 
-module.exports={createPermissons,deletePermissons,permissonsList,createRole,deleteRole,roleList,assignPtoR}
+// register user
+const registerUsers= async (req,res)=>{
+    try {
+        var i =  Math.floor(
+            Math.random() * (1000 - 1 + 1) + 1
+          );
+         const data= db.users({
+                name:req.body.name,
+                mobile_no:req.body.mobile_no,
+                email:req.body.email,
+                Status:req.body.Status,
+                user_id:i
+         })
+         var response =await data.save();
+         if(response)
+         {
+                res.status(201).send({status:201,msg:`User Created Sucessfully eith user_id ${i}`})
+         }
+         else
+         {
+            res.status(400).send({status:'400',msg:'Bad request'})
+         }
+    } catch (error) {
+        res.status(500).send({status:"500",msg:"err",err:`${error}`});
+    }
+}
+
+// delete user
+const deleteuser = async (req,res)=>{
+    try {
+        var user_id = req.query.user_id;
+        if(user_id!=''&& user_id!=null&&user_id!=undefined)
+        {
+            var data = await db.users.findOneAndDelete({user_id:user_id});
+            if(data)
+            {
+                res.status(200).send({status:200,msg:`user deleted sucessfully with this user id ${user_id}`});
+            }
+            else{
+                res.status(206).send({status:206,msg:`no  user found with this user id ${user_id}`});
+            }
+        }
+        else{
+            res.status(400).send({status:400,msg:'please enter a valid user_id'})
+        }
+    } catch (error) {
+        res.status(500).send({status:"500",msg:"err",err:`${error}`});
+    }
+}
+
+// user ist 
+const userList = async (req,res)=>{
+    try {
+        var data =await db.users.find();
+        res.status(200).send({status:200,msg:'sucess',result:data})
+    } catch (error) {
+        res.status(500).send({status:"500",msg:"err",err:`${error}`}); 
+    }
+}
+
+// assign role to user
+const assignRoleToUser=async (req,res)=>{
+    try {
+        var role_id = req.query.role_Id
+        if(role_id!=''&&role_id!=null&&role_id!=undefined)
+        {
+            var user_id =req.query.user_Id;
+           if(user_id!=''&&user_id!=null&&user_id!=undefined)
+           {
+                var role_Data = await db.roles.find({role_Id:role_id},{_id:0});
+                var user_data = await db.users.find({user_id:user_id});  
+                var updated_user_data = await db.users.findByIdAndUpdate(user_data[0]._id,{role:role_Data});
+                if(updated_user_data){
+                    res.status(200).send({status:200,msg:`role with role id ${role_id} sucessfully assign to user`})
+                }
+                else{
+                    res.status(400).send({status:404,msg:'user not found'})
+                }              
+           }
+           else
+           {
+            res.status(200).send({status:'error',msg:'please enter a valid user id'});
+           }
+        }
+        else{
+            res.status(200).send({status:'error',msg:'please enter a valid role id'});
+        }
+    } catch (error) {
+        res.status(500).send({status:"500",msg:"err",err:`${error}`});
+    }
+}
+module.exports={createPermissons,deletePermissons,permissonsList,createRole,deleteRole,roleList,assignPtoR,registerUsers,deleteuser,userList,assignRoleToUser}
