@@ -24,6 +24,9 @@ route.delete('/deleteUser',controller.deleteuser);
 route.get('/all_users',controller.userList);
 
 // assign role to user
-route.post('/assignRoleToUser',controller.assignRoleToUser)
+route.post('/assignRoleToUser',controller.assignRoleToUser);
+
+//single user data
+route.get('/userDetails',controller.single_user_data);
 
 module.exports=route;

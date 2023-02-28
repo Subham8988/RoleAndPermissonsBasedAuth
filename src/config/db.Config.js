@@ -1,5 +1,5 @@
 const mongoDb = require('mongoose');
-const url ="mongodb://localhost:27017/UserAction";
+const url ="mongodb+srv://subham:subham@subham.nxjxhfz.mongodb.net/?retryWrites=true&w=majority";
 const connectionParams ={
     useNewUrlParser: true,
    useUnifiedTopology: true, 

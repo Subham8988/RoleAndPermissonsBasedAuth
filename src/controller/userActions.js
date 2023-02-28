@@ -251,4 +251,28 @@ const assignRoleToUser=async (req,res)=>{
         res.status(500).send({status:"500",msg:"err",err:`${error}`});
     }
 }
-module.exports={createPermissons,deletePermissons,permissonsList,createRole,deleteRole,roleList,assignPtoR,registerUsers,deleteuser,userList,assignRoleToUser}
+
+// single user details
+const single_user_data=async (req,res)=>{
+    try {
+         var user_id =req.query.user_Id;
+        if(user_id!=''&&user_id!=null&&user_id!=undefined)
+        {
+            var data = await db.users.findOne({user_id:user_id});
+             if(data)
+             {
+                res.status(200).send({status:200,msg:`sucess`,result:data})
+             }
+             else{
+                res.status(400).send({status:404,msg:'user not found '})
+             }
+        }
+        else
+        {
+            res.status(400).send({status:404,msg:'Please enter user id'});
+        }
+    } catch (error) {
+        res.status(500).send({status:"500",msg:"err",err:`${error}`}); 
+    }
+}
+module.exports={createPermissons,deletePermissons,permissonsList,createRole,deleteRole,roleList,assignPtoR,registerUsers,deleteuser,userList,assignRoleToUser,single_user_data}
