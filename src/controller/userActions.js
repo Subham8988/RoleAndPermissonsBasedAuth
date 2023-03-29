@@ -1,4 +1,6 @@
 const db = require('../modal/modalSchema');
+const bcrypt = require('bcrypt');
+
 
 
 // create Permissons
@@ -163,25 +165,45 @@ const assignPtoR = async (req,res)=>{
 // register user
 const registerUsers= async (req,res)=>{
     try {
-        var i =  Math.floor(
-            Math.random() * (1000 - 1 + 1) + 1
-          );
-         const data= db.users({
-                name:req.body.name,
-                mobile_no:req.body.mobile_no,
-                email:req.body.email,
-                Status:req.body.Status,
-                user_id:i
-         })
-         var response =await data.save();
-         if(response)
-         {
-                res.status(201).send({status:201,msg:`User Created Sucessfully eith user_id ${i}`})
-         }
-         else
-         {
-            res.status(400).send({status:'400',msg:'Bad request'})
-         }
+          
+            const email = req.body.email;
+            const user = await db.users.findOne({ email: email });
+            console.log('user reg ',user);
+            if(user)
+            {
+            res.status(200).send({status:false,msg:`${email} is already exists`})
+            }
+            else
+            {
+                var i =  Math.floor(
+                    Math.random() * (1000 - 1 + 1) + 1
+                     );
+                const password = req.body.password;
+                const salt = await bcrypt.genSalt(10)
+                const hashPassword = await bcrypt.hash(password, salt)
+             
+                 const data= db.users({
+                        name:req.body.name,
+                        mobile_no:req.body.mobile_no,
+                        email:req.body.email,
+                        Status:req.body.Status,
+                        user_id:i,
+                        password:hashPassword,
+                        adminCheck:req.body.adminCheck
+                 });
+        
+                 var response =await data.save();
+                 if(response)
+                 {
+                        res.status(201).send({status:201,msg:`User Created Sucessfully eith user_id ${i}`})
+                 }
+                 else
+                 {
+                    res.status(400).send({status:'400',msg:'Bad request'})
+                 }
+            }
+
+    
     } catch (error) {
         res.status(500).send({status:"500",msg:"err",err:`${error}`});
     }
@@ -261,6 +283,8 @@ const single_user_data=async (req,res)=>{
             var data = await db.users.findOne({user_id:user_id});
              if(data)
              {
+                res.setHeader('responseType', 'blob');
+                // res.setHeader('Content-Type', 'blob');
                 res.status(200).send({status:200,msg:`sucess`,result:data})
              }
              else{
@@ -275,4 +299,42 @@ const single_user_data=async (req,res)=>{
         res.status(500).send({status:"500",msg:"err",err:`${error}`}); 
     }
 }
-module.exports={createPermissons,deletePermissons,permissonsList,createRole,deleteRole,roleList,assignPtoR,registerUsers,deleteuser,userList,assignRoleToUser,single_user_data}
+
+
+// login
+ const login = async (req,res)=>{
+    try {
+        const email = req.body.email;
+        const user = await db.users.findOne({ email: email })
+        if(user)
+        {
+            if(user.adminCheck)
+            {
+                const password = req.body.password;
+                const passwordCheck =await bcrypt.compare(password,user.password);
+                if(passwordCheck)
+                {
+    
+                    res.status(200).send({status:200,msg:'logIn SucessFully',result:user});
+                }
+                else 
+                {
+                  res.status(200).send({status:false,msg:`Wrong Password`})     
+                }
+            }
+            else{
+                res.status(200).send({status:401,msg:'You are Not Admin Only admin Can logIn to this portal'})
+            }
+          
+           
+        }
+        else{
+             res.status(200).send({status:404,msg:` user with this ${email} not register`,result:'Please register first'})
+        }
+       
+        
+    } catch (error) {
+        res.status(500).send({status:"500",msg:"err",err:`${error}`});
+    }
+ }
+module.exports={createPermissons,deletePermissons,permissonsList,createRole,deleteRole,roleList,assignPtoR,registerUsers,deleteuser,userList,assignRoleToUser,single_user_data,login}

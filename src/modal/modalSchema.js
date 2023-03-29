@@ -43,6 +43,12 @@ const userSchema =db.Schema({
         type:Boolean
     },
     user_id:{type:Number},
+    password:{
+        type:String
+    },
+    adminCheck :{
+        type:Boolean
+    },
     role:[
 
     ]

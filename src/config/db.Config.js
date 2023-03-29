@@ -5,7 +5,7 @@ const connectionParams ={
    useUnifiedTopology: true, 
 }
 mongoDb.set('strictQuery',true);
- const route =mongoDb.connect(url,connectionParams,(err)=>{
+   const  route = mongoDb.connect(url,connectionParams, (err)=>{
     if(!err)
     {
         console.log("Db connected sucessfully");

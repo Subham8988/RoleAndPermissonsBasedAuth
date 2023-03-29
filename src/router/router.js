@@ -29,4 +29,7 @@ route.post('/assignRoleToUser',controller.assignRoleToUser);
 //single user data
 route.get('/userDetails',controller.single_user_data);
 
+//for login
+route.post('/login',controller.login)
+
 module.exports=route;

@@ -3,11 +3,15 @@ const express = require('express');
 const app = express();
 const db = require('../src/config/db.Config');
 const routes = require('../src/router/router');
+const cors = require('cors');
+
 const port = process.env.port || 3200;
 
 // accept json via api 
 app.use(express.json());
-
+app.use(cors({
+    origin:'*'
+}));
 // use handelbars to show html page as in base eurl
 const hbs= require('hbs');
 const path = require('path');
